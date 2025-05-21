@@ -1,0 +1,80 @@
+# 操作系统生成文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE/编辑器配置
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Go 语言相关
+/bin/
+/out/
+*.exe
+*.dll
+*.so
+*.dylib
+__debug_bin
+
+# 依赖管理
+/vendor/
+/pkg_mod/
+
+# 测试相关
+coverage.txt
+*.test
+profile.out
+
+# 环境文件
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+*.log
+logs/
+
+# 构建产物
+dist/
+release/
+
+# Go 工作区
+go.work
+
+# 文档生成
+docs/_build/
+_site/
+
+# 其他临时文件
+*.tmp
+*.bak
+*~
+
+# 示例/测试生成文件
+example/*.exe
+example/*.log
+
+# 调试文件
+debug/
+*.pprof
+
+# Docker 相关
+docker-compose.override.yml
+.env.docker
+
+# 压缩文件
+*.zip
+*.tar
+*.gz
+
+# 排除所有空目录占位文件
+!.gitkeep
