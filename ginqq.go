@@ -6,13 +6,13 @@ import (
 
 type H gin.H
 
-// GinQQ 自定义框架结构体
+// GinQQ 自定义框架结构体。
 type GinQQ struct {
 	*gin.Engine
 	Config *Config
 }
 
-// Group 重写分组，返回自定义RouterGroup
+// Group 返回自定义 RouterGroup 。
 func (g *GinQQ) Group(relativePath string, handlers ...func(*Context)) *RouterGroup {
 	return &RouterGroup{
 		RouterGroup: g.Engine.Group(relativePath, convertToGinHandlers(handlers)...),
@@ -35,55 +35,39 @@ func (g *GinQQ) DELETE(relativePath string, handlers ...func(*Context)) {
 	g.Engine.DELETE(relativePath, convertToGinHandlers(handlers)...)
 }
 
-func (g *GinQQ) registerMiddleware() {
-	//if g.Config.EnableInLog {
-	//	g.Use(InJournalLogMiddleware())
-	//}
-	//if g.Config.EnableOutLog {
-	//	g.Use(OutJournalLogMiddleware())
-	//}
-
+func (g *GinQQ) Use(handlers ...func(*Context)) {
+	g.Engine.Use(convertToGinHandlers(handlers)...)
 }
 
 func convertToGinHandlers(handlers []func(*Context)) []gin.HandlerFunc {
 	ginHandlers := make([]gin.HandlerFunc, 0, len(handlers))
-	for _, h := range handlers {
+	for i := range handlers {
+		h := handlers[i]
 		ginHandlers = append(ginHandlers, func(gc *gin.Context) {
+			gc.Set(XMethodName, getRawHandlerName(h))
 			h(Wrap(gc))
 		})
 	}
 	return ginHandlers
 }
 
-// Default 创建默认的 GinQQ 实例
-func Default(serviceCode string, platCode string) *GinQQ {
-	cfg := &Config{
-		ServiceCode: serviceCode,
-		PlatCode:    platCode,
-	}
-	gq := NewEngineWithConfig(cfg)
-	return gq
-}
-
-func (g *GinQQ) Use(handlers ...func(*Context)) {
-	g.Engine.Use(convertToGinHandlers(handlers)...)
+// Default 创建默认的 GinQQ 实例。
+func Default(svcCode, appName string) *GinQQ {
+	return NewEngineWithConfig(&Config{
+		SvcCode: svcCode,
+		AppName: appName,
+	})
 }
 
 func NewEngineWithConfig(config *Config) *GinQQ {
-	err := config.validate()
-	if err != nil {
+	if err := config.init(); err != nil {
 		panic(err)
 	}
-
-	r := gin.New()
-	gq := &GinQQ{
-		Engine: r,
-		Config: config,
+	gq := &GinQQ{gin.New(), config}
+	if !config.DisableTransactionLog {
+		gq.Use(DispatchTransactionLog)
 	}
-	// 注册中间件
-	gq.registerMiddleware()
-	// 启用HTTP增强
-	if config.DisableHttpClientEnhance == false {
+	if !config.DisableHttpClientEnhance {
 		HttpEnhance(config.HttpClientEnhanceConfig)
 	}
 	return gq

@@ -100,7 +100,7 @@ func HttpEnhance(cfg *HttpClientEnhanceConfig) {
 		base = http.DefaultTransport
 	}
 	// 跳过证书认证
-	if cfg.DisableSkipVerify == false {
+	if !cfg.DisableSkipVerify {
 		if base.(*http.Transport).TLSClientConfig == nil {
 			base.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 		} else {

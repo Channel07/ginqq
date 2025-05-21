@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RouterGroup 自定义路由组，强制处理函数接收自定义的*Context
+// RouterGroup GinQQ 路由组，强制处理函数接收自定义的 *Context 。
 type RouterGroup struct {
 	*gin.RouterGroup
 }
