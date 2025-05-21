@@ -9,9 +9,9 @@ import (
 var globalConfig *Config
 
 type Config struct {
-	// 基础信息，必传字段
-	ServiceCode string // 服务编码
-	PlatCode    string // 平台编码
+	SvcCode string // 服务编码
+	AppName string // 应用名称
+
 	// 功能开关&配置
 	// 服务端系统可观测性
 	DisableMetrics       bool
@@ -41,18 +41,20 @@ type HttpClientEnhanceConfig struct {
 	DisableLoggingClient     bool              // 外部流水
 }
 
+func (c *Config) GetPlayCode() string {
+	return c.SvcCode[:4]
+}
+
 // validate 配置校验逻辑，初始化默认值
 func (c *Config) validate() error {
 	var errs []error
 	if globalConfig != nil {
 		return errors.New("config already initialized")
 	}
+
 	// 必传字段校验
-	if c.ServiceCode == "" {
+	if c.SvcCode == "" {
 		errs = append(errs, errors.New("ServiceCode is required, call WithServiceCode()"))
-	}
-	if c.PlatCode == "" {
-		errs = append(errs, errors.New("PlatCode is required, call WithPlatCode()"))
 	}
 
 	if c.DisableMetrics == false {

@@ -11,7 +11,7 @@ type Context struct {
 
 const (
 	CtxKeyMethodCode = "Method-Code"
-	CtxKeyTraceID    = "Trace-ID"
+	CtxKeyTraceID    = "Transaction-ID"
 )
 
 func Wrap(c *gin.Context) *Context {

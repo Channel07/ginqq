@@ -5,7 +5,7 @@ func LoggingServerMiddleware() func(*Context) {
 	return func(ctx *Context) {
 		// 记录日志
 		println("InJournalLogMiddleware")
-		println(globalConfig.ServiceCode)
+		println(globalConfig.SvcCode)
 		ctx.Next()
 	}
 }
@@ -35,5 +35,13 @@ func SecurityMiddleware() func(*Context) {
 	return func(ctx *Context) {
 		println("SecurityMiddleware")
 		ctx.Next()
+	}
+}
+
+// SetMethodCode 框架中间件数据传递
+func SetMethodCode(methodCode string) func(*Context) {
+	return func(c *Context) {
+		c.Set(CtxKeyMethodCode, methodCode)
+		c.Next()
 	}
 }

@@ -36,13 +36,9 @@ func (g *GinQQ) DELETE(relativePath string, handlers ...func(*Context)) {
 }
 
 func (g *GinQQ) registerMiddleware() {
-	//if g.Config.EnableInLog {
-	//	g.Use(InJournalLogMiddleware())
-	//}
-	//if g.Config.EnableOutLog {
-	//	g.Use(OutJournalLogMiddleware())
-	//}
-
+	if !g.Config.DisableLoggingServer {
+		g.Use(transactionLogMiddleware())
+	}
 }
 
 func convertToGinHandlers(handlers []func(*Context)) []gin.HandlerFunc {
@@ -56,10 +52,10 @@ func convertToGinHandlers(handlers []func(*Context)) []gin.HandlerFunc {
 }
 
 // Default 创建默认的 GinQQ 实例
-func Default(serviceCode string, platCode string) *GinQQ {
+func Default(svcCode, appName string) *GinQQ {
 	cfg := &Config{
-		ServiceCode: serviceCode,
-		PlatCode:    platCode,
+		SvcCode: svcCode,
+		AppName: appName,
 	}
 	gq := NewEngineWithConfig(cfg)
 	return gq
@@ -83,7 +79,7 @@ func NewEngineWithConfig(config *Config) *GinQQ {
 	// 注册中间件
 	gq.registerMiddleware()
 	// 启用HTTP增强
-	if config.DisableHttpClientEnhance == false {
+	if !config.DisableHttpClientEnhance {
 		HttpEnhance(config.HttpClientEnhanceConfig)
 	}
 	return gq
