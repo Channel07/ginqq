@@ -5,9 +5,7 @@ import (
 	"strings"
 )
 
-func GenerateUuid() string {
-	id := uuid.NewV4()
-	ids := id.String()
-	reqId := strings.ReplaceAll(ids, "-", "")
-	return reqId
+func uuid4() string {
+	u4 := uuid.NewV4()
+	return strings.ReplaceAll(u4.String(), "-", "")
 }

@@ -2,17 +2,20 @@
 package ginqq
 
 import (
+	"bytes"
 	"github.com/gin-gonic/gin"
+	"io"
+	"strconv"
+)
+
+const (
+	XMethodCode = "Method-Code"
+	XTraceID    = "Transaction-ID"
 )
 
 type Context struct {
 	*gin.Context
 }
-
-const (
-	CtxKeyMethodCode = "Method-Code"
-	CtxKeyTraceID    = "Transaction-ID"
-)
 
 func Wrap(c *gin.Context) *Context {
 	return &Context{Context: c}
@@ -20,21 +23,33 @@ func Wrap(c *gin.Context) *Context {
 
 // SetMethodCode 框架中间件数据传递
 func (c *Context) SetMethodCode(methodCode string) {
-	c.Set(CtxKeyMethodCode, methodCode)
+	c.Set(XMethodCode, methodCode)
 }
 func (c *Context) GetMethodCode() string {
-	methodCode, exists := c.Get(CtxKeyMethodCode)
+	methodCode, exists := c.Get(XMethodCode)
 	if !exists {
-		methodCode = c.Request.Header.Get(CtxKeyMethodCode)
+		methodCode = c.Request.Header.Get(XMethodCode)
 	}
 	return methodCode.(string)
 }
 
 func (c *Context) GetTraceId() string {
-	traceId := c.Request.Header.Get(CtxKeyTraceID)
+	traceId := c.Request.Header.Get(XTraceID)
 	if traceId == "" {
-		traceId = GenerateUuid()
-		c.Set(CtxKeyTraceID, traceId)
+		traceId = uuid4()
+		c.Set(XTraceID, traceId)
 	}
 	return traceId
+}
+
+// GetRawDataReusable get the request-body and reset it.
+func (c *Context) GetRawDataReusable() ([]byte, error) {
+	body, err := c.GetRawData()
+	length := len(body)
+	if length > 0 {
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
+		c.Request.ContentLength = int64(length)
+		c.Request.Header.Set("Content-Length", strconv.Itoa(length))
+	}
+	return body, err
 }

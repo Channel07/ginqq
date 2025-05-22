@@ -19,7 +19,7 @@
 - 推荐 Go 1.23+
 ### 安装
 ```bash
-go get github.com/XXXX/ginqq
+go get github.com/channel07/ginqq
 
 ```
 ### 简单使用
@@ -28,12 +28,12 @@ go get github.com/XXXX/ginqq
 package main
 
 import (
-	gin "chinatelecom.cn/framework/ginqq"
+	gin "github.com/channel07/ginqq"
 	"net/http"
 )
 
 func main() {
-	r := gin.Default("Y122010101", "Y122")
+	r := gin.Default("A186010101", "channel07-ginqq")
 
 	g := r.Group("/api")
 	g.GET("/hello", func(c *gin.Context) {
@@ -43,7 +43,6 @@ func main() {
 	})
 
 	r.Run(":8080")
-
 }
 ```
 个性化配置
@@ -51,14 +50,14 @@ func main() {
 package main
 
 import (
-	gin "chinatelecom.cn/framework/ginqq"
+	gin "github.com/channel07/ginqq"
 	"net/http"
 )
 
 func main() {
 	cfg := &gin.Config{
-		ServiceCode: "Y122010101",
-		PlatCode:    "Y122",
+		SvcCode: "A186010101",
+		AppName: "channel07-ginqq",
 		MetricsConfig: &gin.MetricsConfig{
 			Buckets: []float64{100, 200, 500, 1000, 2000, 3000, 5000, 10000},
 			CustomLabels: map[string]string{
@@ -76,8 +75,8 @@ func main() {
 	})
 
 	r.Run(":8080")
-
 }
+
 ```
 
 ## 文档

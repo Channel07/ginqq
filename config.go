@@ -45,24 +45,26 @@ func (c *Config) GetPlayCode() string {
 	return c.SvcCode[:4]
 }
 
-// validate 配置校验逻辑，初始化默认值
-func (c *Config) validate() error {
+// init 初始化默认配置。
+func (c *Config) init() error {
 	var errs []error
 	if globalConfig != nil {
 		return errors.New("config already initialized")
 	}
 
-	// 必传字段校验
 	if c.SvcCode == "" {
-		errs = append(errs, errors.New("ServiceCode is required, call WithServiceCode()"))
+		errs = append(errs, errors.New(`parameter "SvcCode" is required`))
+	}
+	if c.AppName == "" {
+		errs = append(errs, errors.New(`parameter "AppName" is required`))
 	}
 
 	if c.DisableMetrics == false {
-		if c.MetricsConfig == nil { // 默认桶
+		if c.MetricsConfig == nil {
 			c.MetricsConfig = &MetricsConfig{
 				Buckets: []float64{100, 200, 500, 1000, 2000, 3000, 5000, 10000}, // 默认桶
 			}
-		} else { // 自定义桶校验
+		} else {
 			if len(c.MetricsConfig.Buckets) == 0 {
 				errs = append(errs, errors.New("MetricsConfig.Buckets cannot be empty"))
 			} else {
