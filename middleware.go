@@ -1,11 +1,13 @@
 package ginqq
 
+import "strings"
+
 // LoggingServerMiddleware 系统日志中间件。
 func LoggingServerMiddleware() func(*Context) {
 	return func(ctx *Context) {
 		// 记录日志
 		println("InJournalLogMiddleware")
-		println(globalConfig.SvcCode)
+		println(cnf.SvcCode)
 		ctx.Next()
 	}
 }
@@ -38,15 +40,10 @@ func SecurityMiddleware() func(*Context) {
 	}
 }
 
-// TransactionLogMiddleware 流水日志中间件
-//func TransactionLogMiddleware() func(*Context) {
-//	return func(c *Context) { dispatchTransactionLog(c) }
-//}
-
 // SetMethodCode 是一个中间件，用于设置接口编码。
 func SetMethodCode(methodCode string) func(*Context) {
 	return func(c *Context) {
-		c.Set(XMethodCode, methodCode)
+		c.Set(XMethodCode, strings.ToUpper(methodCode))
 		c.Next()
 	}
 }

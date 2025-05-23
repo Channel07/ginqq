@@ -4,13 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
-var globalConfig *Config
+var cnf *Config
 
 type Config struct {
-	SvcCode string // 服务编码
-	AppName string // 应用名称
+	SvcCode string // 服务编码（大写）
+	AppName string // 应用名称（小写，以下划线拼接）
 
 	// 功能开关&配置
 	// 服务端系统可观测性
@@ -48,7 +49,7 @@ func (c *Config) GetPlayCode() string {
 // init 初始化默认配置。
 func (c *Config) init() error {
 	var errs []error
-	if globalConfig != nil {
+	if cnf != nil {
 		return errors.New("config already initialized")
 	}
 
@@ -58,6 +59,9 @@ func (c *Config) init() error {
 	if c.AppName == "" {
 		errs = append(errs, errors.New(`parameter "AppName" is required`))
 	}
+
+	c.SvcCode = strings.ToUpper(c.SvcCode)
+	c.AppName = strings.ReplaceAll(strings.ToLower(c.AppName), "-", "_")
 
 	if c.DisableMetrics == false {
 		if c.MetricsConfig == nil {
@@ -85,7 +89,7 @@ func (c *Config) init() error {
 	}
 
 	if len(errs) == 0 {
-		globalConfig = c
+		cnf = c
 		return nil
 	}
 	return errors.Join(errs...)

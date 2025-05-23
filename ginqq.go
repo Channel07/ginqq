@@ -37,8 +37,11 @@ func (g *GinQQ) DELETE(relativePath string, handlers ...func(*Context)) {
 
 func convertToGinHandlers(handlers []func(*Context)) []gin.HandlerFunc {
 	ginHandlers := make([]gin.HandlerFunc, 0, len(handlers))
-	for _, h := range handlers {
+	for i := range handlers {
+		h := handlers[i]
 		ginHandlers = append(ginHandlers, func(gc *gin.Context) {
+			// 获取接口的处理函数的名称，用于流水日志的 `method_name` 字段
+			gc.Set(XMethodName, getRawHandlerName(h))
 			h(Wrap(gc))
 		})
 	}
